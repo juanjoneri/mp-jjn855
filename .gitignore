@@ -133,3 +133,5 @@ datasets/
 hw2/data/
 hw3/data/
 hw3/code-clone/
+hw3/code-clone-embeddings-left/
+hw3/code-clone-embeddings-right/
