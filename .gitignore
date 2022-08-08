@@ -135,3 +135,5 @@ hw3/data/
 hw3/code-clone/
 hw3/code-clone-embeddings-left/
 hw3/code-clone-embeddings-right/
+hw3/code-clone-method-embeddings-left/
+hw3/code-clone-method-embeddings-right/
