@@ -1,0 +1,20 @@
+- The first feature that we designed was a comparison of the java keywords of the two methods. The java keyword composition of the two methods should be similar if they have clone functionality. In contrast, bigrams only tell us the context for each code piece but don’t tell us anything else regarding how the two methods differ. With that being said, we only noticed a modest improvement from using the keyword feature. The reason could be that we are not taking into account how similar some keywords are. For instance, `for` and `while` are very similar in what they do, but our approach doesn’t leverage that. If we had more time, we could have used something like embeddings to leverage that.
+  - Best java keyword result: 0.7725 (+/- 0.0747)
+  - Bi-gram/unigram result: 0.7565 (+/- 0.0663)
+
+- We designed a feature using the method’s signature to extract useful information. We collected the return type, number of method arguments, and function names. We think that these features should provide more meaningful information than bi-grams for the same reason as the prior explanation. We found that these features also marginally improved accuracy. One potential reason is that our parsing wasn’t perfect to extract method argument count and return type. Additionally, the return type feature had the same problem as the java keywords where we didn’t leverage the fact that some types are more similar than others (e.g. `int` and `float`).
+  - Best: 0.7685 (+/- 0.0568)
+  - Bi-gram/unigram result: 0.7565 (+/- 0.0663)
+ 
+- We also considered similarity based on the intersection of all the data types each function uses. The intuition was that if you asked the entire class to write a Java function to sum all values in an integer array, our functions would use roughly the same amount of ints, ints[], Strings, etc. See the below examples for better details.  We also compared the number of statements in each function, expressed as a ratio of shorter to longer. The logic was that similar functions could have roughly similar lengths. This set of features improved our 10-fold cross-validation accuracy a substantial amount compared to bigrams. We think this is because of our assumption that equivalent methods are more likely to score high on this metric.
+  - Examples:
+    - Method 1: `int, int, int, String` / Method 2: `int int String char` (score of 3)
+    - Method 1: `int string` / Method 2: `string Socket` (score of 1)
+  - Best: 0.8205 (+/- 0.0522)
+  - Bi-gram/unigram result: 0.7565 (+/- 0.0663)
+
+- The final feature that was helpful was using a w2v embedding that we borrowed from https://github.com/tech-srl/code2vec. The embeddings were pretrained using an LSTM with a dataset comprised of 14M java examples. For each document in the dataset, we generated 2 128d vectors representing the mean of the embeddings obtained for each token in the functions. We think this feature was helpful compared to bigrams because it captures the similarity between java tokens. For example, the tokens `toLower` and `equalsIgnoreCase` would have similar embeddings. We also explored embedding the tokens in the method name of each function, but that did not help increase the overall score, so it was not included in the final model.
+  - Best: 0.7680 (+/- 0.0697)
+  - Bi-gram/unigram result: 0.7565 (+/- 0.0663)
+  
+Combining all 4 features above we got a 10-fold cross validation accuracy of 0.8330 (+/- 0.0448) compared to the Bi-gram/unigram result: 0.7565 (+/- 0.0663)
